@@ -86,12 +86,13 @@ def insert_idol_youtube_stats():
         df, table_ref, job_config=job_config
     )
     load_job.result()
+    print(f'Complete job!')
     return
 
 
 if __name__ == "__main__":
 
-    schedule.every(12).hours.do(insert_idol_youtube_stats)
+    schedule.every(1).hours.do(insert_idol_youtube_stats)
     while True:
         schedule.run_pending()
         time.sleep(10)
