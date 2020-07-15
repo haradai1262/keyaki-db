@@ -1,3 +1,7 @@
+# アイドルのYouTubeチャンネルを取得する
+# ユーチュラというサイトの「アイドル」タグが付与されたチャンネルのリストを使った
+# '音楽' in tags and '女性' in tags and '芸能人' in tags
+
 import pandas as pd
 import re
 import requests
