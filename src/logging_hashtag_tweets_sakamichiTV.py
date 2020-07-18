@@ -80,7 +80,7 @@ class StdOutListener(tweepy.StreamListener):
         df = pd.DataFrame(rows, columns=col_names)
 
         # add df to bq
-        table_name = 'idol_datalake_hashtagtweets'
+        table_name = 'idol_datalake_hashtagtweets_sakamichiTV'
         dataset_name = bqtable_cfg[table_name]['dataset_name']
 
         job_config = bigquery.LoadJobConfig()
@@ -108,13 +108,13 @@ def start_stream(auth, sol, queries):
 
 def main():
 
-    queries = ["#乃木坂46", "#欅坂46", "#日向坂46"]
+    queries = ["#乃木坂工事中", "#欅って書けない", "#日向坂で会いしましょう"]
     with open('../secret/twitterapi.json', 'r') as f:
         key_dic = json.load(f)
 
-    key_id = "8"
+    key_id = "10"
 
-    sol = StdOutListener(insert_div=1000)
+    sol = StdOutListener(insert_div=100)
     auth = tweepy.OAuthHandler(key_dic[key_id]["app_key"], key_dic[key_id]["app_secret"])
     auth.set_access_token(key_dic[key_id]["oauth_token"], key_dic[key_id]["oauth_token_secret"])
 
