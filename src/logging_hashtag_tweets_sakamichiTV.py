@@ -114,7 +114,7 @@ def main():
 
     key_id = "10"
 
-    sol = StdOutListener(insert_div=100)
+    sol = StdOutListener(insert_div=1000)
     auth = tweepy.OAuthHandler(key_dic[key_id]["app_key"], key_dic[key_id]["app_secret"])
     auth.set_access_token(key_dic[key_id]["oauth_token"], key_dic[key_id]["oauth_token_secret"])
 

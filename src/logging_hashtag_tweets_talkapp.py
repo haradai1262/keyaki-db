@@ -80,7 +80,7 @@ class StdOutListener(tweepy.StreamListener):
         df = pd.DataFrame(rows, columns=col_names)
 
         # add df to bq
-        table_name = 'idol_datalake_hashtagtweets'
+        table_name = 'idol_datalake_hashtagtweets_talkapp'
         dataset_name = bqtable_cfg[table_name]['dataset_name']
 
         job_config = bigquery.LoadJobConfig()
@@ -108,11 +108,56 @@ def start_stream(auth, sol, queries):
 
 def main():
 
-    queries = ["#乃木坂46", "#欅坂46", "#日向坂46"]  # queries = ["#乃木坂工事中", "#欅って書けない", "#日向坂で会いしましょう"]
+    queries = [
+        "#nijitalk", "#nijikatalk",
+        "#rinatalk",
+        "#ozetalk",
+        "#minamitalk",
+        "#pontalk", "#yuitalk",
+        "#fuyukatalk",
+        "#shioritalk",
+        "#yuukatalk", "#yukkatalk",
+        "#mizutalk", "#habutalk"
+        "#aoitalk",
+        "#akanetalk",
+        "#rikatalk",
+        "#risatalk",
+        "#inoritalk",
+        "#yumikotalk",
+        "#takemotalk",
+        "#honotalk",
+        "#karintalk",
+        "#marinatalk", "#matsuritalk",
+        "#rikotalk", "#rikopitalk",
+        "#hikarutalk", "#runtalk",
+        "#tentalk",
+        "#sarinatalk",
+        "#kagetalk",
+        "#shihotalk",
+        "#kyonkotalk",
+        "#kumitalk",
+        "#mireitalk",
+        "#manatalk",
+        "#ayakatalk",
+        "#meitalk",
+        "#mikutalk",
+        "#hinatalk",
+        "#hinatalk",
+        "#suzukatalk",
+        "#nibutalk",
+        "#hiyoritalk",
+        "#konokatalk",
+        "#manamotalk",
+        "#mihotalk",
+        "#hinanotalk",
+        "#mikunitalk",
+        "#marietalk",
+        "#haruyotalk",
+    ]
     with open('../secret/twitterapi.json', 'r') as f:
         key_dic = json.load(f)
 
-    key_id = "8"
+    key_id = "14"
 
     sol = StdOutListener(insert_div=1000)
     auth = tweepy.OAuthHandler(key_dic[key_id]["app_key"], key_dic[key_id]["app_secret"])
