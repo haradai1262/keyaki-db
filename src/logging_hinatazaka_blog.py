@@ -27,10 +27,10 @@ client = bigquery.Client(
     project=credentials.project_id,
 )
 
+table_name = 'hinatazaka46__datalake__blog'
 
 def read_latest_savedblog_ts_from_bq():
 
-    table_name = 'keyakizaka46__datalake__blog'
     project_name = bqtable_cfg[table_name]['project_name']
     dataset_name = bqtable_cfg[table_name]['dataset_name']
 
@@ -46,31 +46,30 @@ def read_latest_savedblog_ts_from_bq():
     return latest_savedblog_ts
 
 
-def insert_keyakizaka_blog():
+def insert_hinatazaka_blog():
 
-    max_page_number = 455
+    max_page_number = 489 # ...
     latest_date = read_latest_savedblog_ts_from_bq()
     end_flag = False
 
     all_articles = []
     for page_idx in tqdm(range(max_page_number)):
-        target_url = f'http://www.keyakizaka46.com/s/k46o/diary/member/list?ima=0000&page={page_idx}&cd=member'
+        target_url = 'https://www.hinatazaka46.com/s/official/diary/member/list?ima=0000&page=%d&cd=member' % page_idx
         r = requests.get(target_url)
-        page_soup = BeautifulSoup(r.text, 'lxml')
-
-        for i, j in enumerate(page_soup.select('article')):
-            author = j.p.text.replace(' ', '').replace('\n', '')
-            datetime_str = j.find('div', class_="box-bottom").li.text.replace(' ', '').replace('\n', '')
-            datetime_save = datetime.datetime.strptime(datetime_str, '%Y/%m/%d%H:%M')
-            title = j.find('div', class_="box-ttl").a.text
-            body = j.find('div', class_="box-article")
-            text = body.text
-            page_url = 'http://www.keyakizaka46.com' + j.find('li', class_="singlePage").a.get('href')
+        soup = BeautifulSoup(r.text, 'lxml')
+        for i, j in enumerate(soup.find_all( 'div', class_='p-blog-article' )):
+            author = j.find('div', class_='c-blog-article__name').text.replace(' ','').replace('\n','')
+            datetime_str = j.find('div', class_='c-blog-article__date').text.strip()
+            datetime_save = datetime.datetime.strptime(datetime_str, '%Y.%m.%d %H:%M')  # 2020.7.21 22:56
+            title = j.find('div', class_='c-blog-article__title').text.strip()
+            body = j.find('div', class_='c-blog-article__text')
+            text = body.text.strip()
+            page_url = 'https://www.hinatazaka46.com' + j.find('div', class_='p-button__blog_detail').a.get('href')
             page_id = page_url.split('/')[-1].split('?')[0]
             images = ''
-            for img in body.find_all('img'):
+            for img in  body.find_all('img'):
                 images += '%s\t' % img.get('src')
-
+            # all_articles.append([page_id, author, datetime_save, title, text, images, page_url])
             if datetime_save > latest_date:
                 all_articles.append([page_id, author, datetime_save, title, text, images, page_url])
                 continue
@@ -83,7 +82,6 @@ def insert_keyakizaka_blog():
     df = pd.DataFrame(all_articles, columns=['page_id', 'author', 'timestamp', 'title', 'text', 'images', 'url'])
 
     # add df to bq
-    table_name = 'keyakizaka46__datalake__blog'
     dataset_name = bqtable_cfg[table_name]['dataset_name']
 
     job_config = bigquery.LoadJobConfig()
@@ -100,8 +98,8 @@ def insert_keyakizaka_blog():
 
 if __name__ == "__main__":
 
-    # insert_keyakizaka_blog()
-    schedule.every(6).hours.do(insert_keyakizaka_blog)
+    # insert_hinatazaka_blog()
+    schedule.every(6).hours.do(insert_hinatazaka_blog)
     while True:
         schedule.run_pending()
         time.sleep(10)
