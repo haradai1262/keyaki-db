@@ -12,6 +12,8 @@ secret_dir = '../secret'
 
 with open(f'../config/bqtable_cfg.json', 'r') as f:
     bqtable_cfg = json.load(f)
+with open(f'../config/hashtag_query_cfg.json', 'r') as f:
+    hashtag_query_cfg = json.load(f)
 
 # gcp setting
 key_path = f'{secret_dir}/tkhr-free-myaun.json'
@@ -23,6 +25,8 @@ client = bigquery.Client(
     credentials=credentials,
     project=credentials.project_id,
 )
+
+table_name = 'idol_datalake_hashtagtweets'
 
 
 class StdOutListener(tweepy.StreamListener):
@@ -80,7 +84,6 @@ class StdOutListener(tweepy.StreamListener):
         df = pd.DataFrame(rows, columns=col_names)
 
         # add df to bq
-        table_name = 'idol_datalake_hashtagtweets'
         dataset_name = bqtable_cfg[table_name]['dataset_name']
 
         job_config = bigquery.LoadJobConfig()
@@ -108,7 +111,7 @@ def start_stream(auth, sol, queries):
 
 def main():
 
-    queries = ["#乃木坂46", "#欅坂46", "#日向坂46"]  # queries = ["#乃木坂工事中", "#欅って書けない", "#日向坂で会いしましょう"]
+    queries = hashtag_query_cfg[table_name]
     with open('../secret/twitterapi.json', 'r') as f:
         key_dic = json.load(f)
 
