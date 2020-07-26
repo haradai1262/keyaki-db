@@ -1,4 +1,5 @@
 
+import argparse
 import json
 import tweepy
 import pandas as pd
@@ -8,8 +9,15 @@ from apiclient.discovery import build
 from google.cloud import bigquery
 from google.oauth2 import service_account
 
-secret_dir = '../secret'
+parser = argparse.ArgumentParser()
+parser.add_argument('-b', '--bqtable_name')
+parser.add_argument('-t', '--twitter_api_id')
+options = parser.parse_args()
 
+table_name = options.bqtable_name
+key_id = options.twitter_api_id
+
+secret_dir = '../secret'
 with open(f'../config/bqtable_cfg.json', 'r') as f:
     bqtable_cfg = json.load(f)
 with open(f'../config/hashtag_query_cfg.json', 'r') as f:
@@ -25,8 +33,6 @@ client = bigquery.Client(
     credentials=credentials,
     project=credentials.project_id,
 )
-
-table_name = 'idol_datalake_hashtagtweets'
 
 
 class StdOutListener(tweepy.StreamListener):
@@ -114,8 +120,6 @@ def main():
     queries = hashtag_query_cfg[table_name]
     with open('../secret/twitterapi.json', 'r') as f:
         key_dic = json.load(f)
-
-    key_id = "8"
 
     sol = StdOutListener(insert_div=1000)
     auth = tweepy.OAuthHandler(key_dic[key_id]["app_key"], key_dic[key_id]["app_secret"])
